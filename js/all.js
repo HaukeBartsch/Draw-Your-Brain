@@ -52,6 +52,11 @@ function init() {
     canvas.addEventListener("mouseout", function (e) {
         findxy('out', e)
     }, false);
+
+    window.onresize = function(event) {
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
+    }
 }
 
 function color(obj) {
