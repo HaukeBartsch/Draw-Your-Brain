@@ -162,7 +162,12 @@ jQuery(document).ready(function() {
 	structure = [];
 	currentCommand = {};
 	erase(false); // do not ask
+	// and go back
+	setTimeout(function() {
+	    window.location.href = "/index.html";
+	}, 300);
     });
-    
+
+    color("orange"); // set start color
     init();
 });
