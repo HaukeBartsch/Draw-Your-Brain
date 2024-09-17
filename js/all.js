@@ -14,12 +14,45 @@ var structure = []; // an array of drawing commands
 var currentCommand = {};
 var globalTime = null; // starts with the first mousedown
 
+
+function getInteractionLocation(event) {
+  let pos = { x: event.clientX, y: event.clientY };
+  if (event.touches) {
+      pos = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+  }
+  const rect = event.target.getBoundingClientRect();
+  const x_rel = pos.x - rect.left;
+  const y_rel = pos.y - rect.top;
+  const x = Math.round((x_rel * event.target.width) / rect.width);
+  const y = Math.round((y_rel * event.target.height) / rect.height);
+  return [x, y];
+}
+
 function init() {
   canvas = document.getElementById("canvas");
   ctx = canvas.getContext("2d");
   w = canvas.width;
   h = canvas.height;
 
+    canvas.addEventListener(
+        "touchmove",
+        function(e) {
+            findxy("move", e);
+            if (flag) {
+                if (typeof currentCommand.pos == "undefined") {
+                    currentCommand.pos = [];
+                }
+                if (globalTime != null)
+                    currentCommand.pos.push([
+                        currX / w,
+                        currY / h,
+                        new Date() - globalTime,
+                    ]);
+            }
+        },
+        false,
+    );
+    
   canvas.addEventListener(
     "mousemove",
     function (e) {
@@ -38,6 +71,20 @@ function init() {
     },
     false,
   );
+    canvas.addEventListener(
+        "touchstart",
+        function(e) {
+            findxy("down", e);
+            if (globalTime == null) {
+                globalTime = new Date();
+            }
+            currentCommand.color = x;
+            currentCommand.lineWidth = y;
+        },
+        false,
+    );
+
+    
   canvas.addEventListener(
     "mousedown",
     function (e) {
@@ -70,7 +117,29 @@ function init() {
     },
     false,
   );
-  canvas.addEventListener(
+    canvas.addEventListener(
+        "touchup",
+        function(e) {
+            findxy("up", e);
+            // store the last mouse position as well                                                                                            
+            if (typeof currentCommand.pos == "undefined") {
+                currentCommand.pos = [];
+            }
+            if (globalTime != null)
+                currentCommand.pos.push([
+                    currX / w,
+                    currY / h,
+                    new Date() - globalTime,
+                ]);
+
+            structure.push(JSON.parse(JSON.stringify(currentCommand))); // trivial copy                                                         
+            currentCommand = {}; // clear again                                                                                                 
+        },
+        false,
+    );
+
+
+    canvas.addEventListener(
     "mouseout",
     function (e) {
       findxy("out", e);
@@ -89,11 +158,17 @@ function color(obj) {
 }
 
 function getMousePos(canvas, evt) {
+  erg	= getInteractionLocation(evt);
+  return  {
+    x: erg[0],
+    y: erg[1]
+  };
+/*
   var rect = canvas.getBoundingClientRect();
   return {
     x: evt.clientX - rect.left,
     y: evt.clientY - rect.top,
-  };
+  }; */
 }
 
 function draw() {
