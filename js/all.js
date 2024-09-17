@@ -185,12 +185,15 @@ function draw() {
 function erase(ask = true) {
   var m = true;
   if (ask) {
-    m = confirm("Want to clear");
+    m = confirm("Clear screen?");
   }
   if (m) {
-    ctx.clearRect(0, 0, w, h);
-    if (document.getElementById("canvasimg"))
-      document.getElementById("canvasimg").style.display = "none";
+      ctx.clearRect(0, 0, w, h);
+      // start over with memorizing the drawings as well
+      structure = [];
+      currentCommand = {};
+      if (document.getElementById("canvasimg"))
+	  document.getElementById("canvasimg").style.display = "none";
   }
 }
 
