@@ -192,6 +192,7 @@ function erase(ask = true) {
       // start over with memorizing the drawings as well
       structure = [];
       currentCommand = {};
+      globalTime = null;
       if (document.getElementById("canvasimg"))
 	  document.getElementById("canvasimg").style.display = "none";
   }
