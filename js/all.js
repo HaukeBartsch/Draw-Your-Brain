@@ -118,7 +118,7 @@ function init() {
     false,
   );
     canvas.addEventListener(
-        "touchup",
+        "touchend",
         function(e) {
             findxy("up", e);
             // store the last mouse position as well                                                                                            
