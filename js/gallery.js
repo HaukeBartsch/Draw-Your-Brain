@@ -98,7 +98,7 @@ function loadGallery() {
     structures = data;
     // now start animating all playbacks
     jQuery("div.gallery div.playback").each(function (a) {
-      console.log("do something for " + a); // should be the index
+      //console.log("do something for " + a); // should be the index
       var tmp = jQuery("#IMG" + a + " canvas")[0];
       var structure = structures[a];
       playback(tmp, structure); // start the animation
