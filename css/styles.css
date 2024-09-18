@@ -9,8 +9,8 @@
 
 .tools {
     position: absolute;
-    bottom: 5px;
-    right: 5px;
+    top: -35px;
+    left: 5px;
     display: flex;
 }
 
