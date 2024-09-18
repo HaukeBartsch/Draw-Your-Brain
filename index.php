@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Draw your brain</title>
         <link rel="stylesheet" href="css/bootstrap.min.css" />
-        <link rel="stylesheet" href="css/styles.css?_=123" />
+        <link rel="stylesheet" href="css/styles.css?_=1236" />
     </head>
     <body>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -115,6 +115,16 @@
                             </div>
                         </div>
                         <div class="modal-footer">
+<?php if (isset($_GET["admin"])): ?>
+                            <button
+                                type="button"
+                                class="btn btn-primary"
+                              data-bs-dismiss="modal"
+			      id="delete-button"
+                            >
+                                Delete
+                            </button>
+<?php endif; ?>			  
                             <button
                                 type="button"
                                 class="btn btn-primary"
@@ -130,6 +140,6 @@
 
         <script src="js/bootstrap.bundle.min.js"></script>
         <script src="js/jquery-3.7.1.min.js"></script>
-        <script src="js/gallery.js?_=1235"></script>
+        <script src="js/gallery.js?_=1236"></script>
     </body>
 </html>

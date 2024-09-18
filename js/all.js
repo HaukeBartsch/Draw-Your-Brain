@@ -302,7 +302,7 @@ jQuery(document).ready(function () {
     erase(false); // do not ask
     // and go back
     setTimeout(function () {
-      window.location.href = "/index.html";
+      window.location.href = "/";
     }, 300);
   });
 

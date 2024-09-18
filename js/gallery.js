@@ -107,8 +107,24 @@ function loadGallery() {
 	//clearInterval(value.interval);
     //});
     //byCanvasData = new Map();
-    
+
     jQuery.getJSON("getImage.php", function (data) {
+	// we might need to remove some playbacks
+	var deletePlaybacks = [];
+	jQuery("div.gallery div.playback").each(function(idx,a) {
+	    var si = jQuery(a).attr('structure_index');
+	    // this structure index needs to still exist in data, otherwise delete here
+	    var found = false;
+	    for (var j = 0; j < data.length; j++) {
+		if (data[j][0] == si)
+		    found = true;
+	    }
+	    if (!found) {
+		jQuery(a).remove();
+		console.log("needed to remove an old structure index: " + si);
+	    }
+	});
+	
 	// we get an array of structures back here, start adding playbacks
 	var newPlaybacks = [];
 	for (var i = 0; i < data.length; i++) {
@@ -168,7 +184,8 @@ jQuery(document).ready(function () {
   const modalDialog = document.getElementById("details");
   modalDialog.addEventListener("shown.bs.modal", function (e) {
     var canvas = jQuery("#detailed_canvas canvas")[0];
-    var num = jQuery("#detailed_canvas canvas").attr("draw");
+      var num = jQuery("#detailed_canvas canvas").attr("draw");
+      jQuery('#delete-button').attr('tar', num);
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.offsetHeight;
     if (byCanvasData.has(keyFromCanvas(canvas))) {
@@ -202,4 +219,12 @@ jQuery(document).ready(function () {
       byCanvasData = new Map();
     }
   });
+
+    jQuery('#delete-button').on('click', function() {
+	var num = jQuery(this).attr('tar');
+	//alert('delete this image' + num);
+	jQuery.getJSON('deleteImage.php', { "num": num }, function(data) {
+	    console.log("done");
+	});
+    });
 });
