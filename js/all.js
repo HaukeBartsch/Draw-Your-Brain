@@ -147,10 +147,13 @@ function init() {
     false,
   );
 
-  window.onresize = function (event) {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  };
+    window.onresize = function (event) {
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
+	// we should draw again in case we got cleared out
+	// a resize will clear the canvas, also remove the drawn image to make this consistent
+	erase(false);
+    };
 }
 
 function color(obj) {
