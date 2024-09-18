@@ -12,80 +12,91 @@ function keyFromCanvas(canvas) {
   if (typeof key != "undefined") {
     return key;
   }
-  return canvas; // fallback in case we do not have a valid id
+    return canvas; // fallback in case we do not have a valid id
 }
 
 function playback(canvas, structure) {
-  // what is the length of this structures display?
-  var start = null;
-  if (byCanvasData.has(keyFromCanvas(canvas))) {
-    start = byCanvasData.get(keyFromCanvas(canvas)).start;
-  } else {
-    start = new Date();
-  }
-
-  var maxTime =
-    structure[structure.length - 1].pos[
-      structure[structure.length - 1].pos.length - 1
-    ][2];
-
-  // based on the structure we need to do what?
-  ctx = canvas.getContext("2d");
-  var w = canvas.width;
-  var h = canvas.height;
-  ctx.clearRect(0, 0, w, h); // clear first, draw up to the point in the structure based on now -start
-    var endTime = (new Date()) - start;
-  if (endTime > maxTime) {
-    // start over with the animation
-    start = new Date();
-      // update
-      if (byCanvasData.has(keyFromCanvas(canvas))) { // only if this key exists already
-        byCanvasData.set(keyFromCanvas(canvas), {
-          interval: byCanvasData.get(keyFromCanvas(canvas)).interval,
-          start,
-        });
-      }
-  }
+    // what is the length of this structures display?
+    var start = null;
+    if (byCanvasData.has(keyFromCanvas(canvas))) {
+	start = byCanvasData.get(keyFromCanvas(canvas)).start;
+    } else {
+	start = new Date();
+    }
+    
+    var maxTime =
+	structure[structure.length - 1].pos[
+	    structure[structure.length - 1].pos.length - 1
+	][2];
+    
+    // based on the structure we need to do what?
+    ctx = canvas.getContext("2d");
+    var w = canvas.width;
+    var h = canvas.height;
     var drawPaw = false;
+
+    var endTime = (new Date()) - start;
+    if (endTime > maxTime) {
+	// start over with the animation (or be done with it if we are in detailed_canvas, draw only once)
+	if (jQuery(canvas).parent().attr('id') != "detailed_canvas") {
+	
+	    start = new Date();
+	    // update
+	    if (byCanvasData.has(keyFromCanvas(canvas))) { // only if this key exists already
+		byCanvasData.set(keyFromCanvas(canvas), {
+		    interval: byCanvasData.get(keyFromCanvas(canvas)).interval,
+		    start,
+		});
+	    }
+	}
+    }
+    ctx.clearRect(0, 0, w, h); // clear first, draw up to the point in the structure based on now -start
     if (jQuery(canvas).parent().attr('id') == "detailed_canvas")
 	drawPaw = true;
-    var drawPawOffset = [-270, -160];
-
-  ctx.lineCap = "round";
-  for (var i = 0; i < structure.length; i++) {
-    var d = structure[i];
-    if (typeof d.pos == "undefined") continue;
-    // set color and line, start drawing pos values
-    ctx.beginPath();
-    ctx.moveTo(Math.round(d.pos[0][0] * w), Math.round(d.pos[0][1] * h));
-    for (var j = 1; j < d.pos.length; j++) {
-      // find out if we should still draw
-	if (d.pos[j][2] > endTime) {
-	    if (drawPaw) {
-		ctx.lineWidth = w < 200 ? 1 : d.lineWidth;
-		ctx.strokeStyle = d.color;
-		ctx.stroke();
-		ctx.beginPath(); // start a new path to have the paw be over the last path
-		// add the drawer on this position, but only if we are in the full window mode
-		ctx.drawImage(svgImage, Math.round(d.pos[j][0] * w) + drawPawOffset[0], Math.round(d.pos[j][1] * h) + drawPawOffset[1]);
-	    }
-	    break; // stop drawing here
+    // if we are after the last time don't draw the paw
+    if (endTime > maxTime) {
+	if (jQuery(canvas).parent().attr('id') == "detailed_canvas") {
+	    drawPaw = false;
 	}
-      ctx.lineTo(Math.round(d.pos[j][0] * w), Math.round(d.pos[j][1] * h));
     }
-    ctx.lineWidth = w < 200 ? 1 : d.lineWidth;
-    ctx.strokeStyle = d.color;
-    ctx.stroke();
-    //ctx.closePath();
-    if (d.pos[d.pos.length - 1][2] > endTime) break; // stop drawing altogether
-  }
-  if (!byCanvasData.has(keyFromCanvas(canvas))) { // if this is the first time create a new interval
-      var to = setInterval(function () {
-        playback(canvas, structure);
-      }, 100);
-      // add new canvas data
-      byCanvasData.set(keyFromCanvas(canvas), { interval: to, start: start });
-  }
+    
+    var drawPawOffset = [-270, -160];
+    
+    ctx.lineCap = "round";
+    for (var i = 0; i < structure.length; i++) {
+	var d = structure[i];
+	if (typeof d.pos == "undefined") continue;
+	// set color and line, start drawing pos values
+	ctx.beginPath();
+	ctx.moveTo(Math.round(d.pos[0][0] * w), Math.round(d.pos[0][1] * h));
+	for (var j = 1; j < d.pos.length; j++) {
+	    // find out if we should still draw
+	    if (d.pos[j][2] > endTime) {
+		if (drawPaw) {
+		    ctx.lineWidth = w < 200 ? 1 : d.lineWidth;
+		    ctx.strokeStyle = d.color;
+		    ctx.stroke();
+		    ctx.beginPath(); // start a new path to have the paw be over the last path
+		    // add the drawer on this position, but only if we are in the full window mode
+		    ctx.drawImage(svgImage, Math.round(d.pos[j][0] * w) + drawPawOffset[0], Math.round(d.pos[j][1] * h) + drawPawOffset[1]);
+		}
+		break; // stop drawing here
+	    }
+	    ctx.lineTo(Math.round(d.pos[j][0] * w), Math.round(d.pos[j][1] * h));
+	}
+	ctx.lineWidth = w < 200 ? 1 : d.lineWidth;
+	ctx.strokeStyle = d.color;
+	ctx.stroke();
+	//ctx.closePath();
+	if (d.pos[d.pos.length - 1][2] > endTime) break; // stop drawing altogether
+    }
+    if (!byCanvasData.has(keyFromCanvas(canvas))) { // if this is the first time create a new interval
+	var to = setInterval(function () {
+            playback(canvas, structure);
+	}, 100);
+	// add new canvas data
+	byCanvasData.set(keyFromCanvas(canvas), { interval: to, start: start });
+    }
 }
 
 function loadGallery() {
