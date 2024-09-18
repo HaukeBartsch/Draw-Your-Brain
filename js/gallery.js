@@ -32,13 +32,13 @@ function playback(canvas, structure) {
   var w = canvas.width;
   var h = canvas.height;
   ctx.clearRect(0, 0, w, h); // clear first, draw up to the point in the structure based on now -start
-  var endTime = new Date() - start;
+    var endTime = (new Date()) - start;
   if (endTime > maxTime) {
     // start over with the animation
     start = new Date();
-    // update
+      // update
     byCanvasData.set(keyFromCanvas(canvas), {
-      interval: byCanvasData.set(keyFromCanvas(canvas)).interval,
+      interval: byCanvasData.get(keyFromCanvas(canvas)).interval,
       start,
     });
   }
