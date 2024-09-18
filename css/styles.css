@@ -1,6 +1,6 @@
 .brainSurface {
-    height: 100%;
     width: 100%;
+    aspect-ratio: 70 / 50;
     left: auto;
     border: 1px solid grey;
     border-radius: 5px;
@@ -33,7 +33,6 @@ div.color:hover {
 #canvas {
     width: 100%;
     height: 100%;
-    aspect-ratio: 0.9;
 }
 
 .gallery {
@@ -43,7 +42,7 @@ div.color:hover {
 
 .detailed_parent {
     width: 100%;
-    height: 100%;
+    aspect-ratio: 70 / 50;
 }
 
 .playback {
