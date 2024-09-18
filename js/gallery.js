@@ -4,6 +4,8 @@ var ctx = null;
 // we need to store the start time as well
 // so values should be object.intervalID, object.startTime
 var byCanvasData = new Map();
+var svgImage = new Image();
+svgImage.src = "/images/catPaw.svg";
 
 function keyFromCanvas(canvas) {
   var key = jQuery(canvas).parent().attr("id");
@@ -44,6 +46,10 @@ function playback(canvas, structure) {
         });
       }
   }
+    var drawPaw = false;
+    if (jQuery(canvas).parent().attr('id') == "detailed_canvas")
+	drawPaw = true;
+    var drawPawOffset = [-270, -160];
 
   ctx.lineCap = "round";
   for (var i = 0; i < structure.length; i++) {
@@ -54,7 +60,17 @@ function playback(canvas, structure) {
     ctx.moveTo(Math.round(d.pos[0][0] * w), Math.round(d.pos[0][1] * h));
     for (var j = 1; j < d.pos.length; j++) {
       // find out if we should still draw
-      if (d.pos[j][2] > endTime) break; // stop drawing here
+	if (d.pos[j][2] > endTime) {
+	    if (drawPaw) {
+		ctx.lineWidth = w < 200 ? 1 : d.lineWidth;
+		ctx.strokeStyle = d.color;
+		ctx.stroke();
+		ctx.beginPath(); // start a new path to have the paw be over the last path
+		// add the drawer on this position, but only if we are in the full window mode
+		ctx.drawImage(svgImage, Math.round(d.pos[j][0] * w) + drawPawOffset[0], Math.round(d.pos[j][1] * h) + drawPawOffset[1]);
+	    }
+	    break; // stop drawing here
+	}
       ctx.lineTo(Math.round(d.pos[j][0] * w), Math.round(d.pos[j][1] * h));
     }
     ctx.lineWidth = w < 200 ? 1 : d.lineWidth;
