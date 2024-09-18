@@ -37,10 +37,12 @@ function playback(canvas, structure) {
     // start over with the animation
     start = new Date();
       // update
-    byCanvasData.set(keyFromCanvas(canvas), {
-      interval: byCanvasData.get(keyFromCanvas(canvas)).interval,
-      start,
-    });
+      if (byCanvasData.has(keyFromCanvas(canvas))) { // only if this key exists already
+        byCanvasData.set(keyFromCanvas(canvas), {
+          interval: byCanvasData.get(keyFromCanvas(canvas)).interval,
+          start,
+        });
+      }
   }
 
   ctx.lineCap = "round";
@@ -61,55 +63,70 @@ function playback(canvas, structure) {
     //ctx.closePath();
     if (d.pos[d.pos.length - 1][2] > endTime) break; // stop drawing altogether
   }
-  if (!byCanvasData.has(keyFromCanvas(canvas))) {
-    var to = setInterval(function () {
-      playback(canvas, structure);
-    }, 100);
-    // add new canvas data
-    byCanvasData.set(keyFromCanvas(canvas), { interval: to, start: start });
+  if (!byCanvasData.has(keyFromCanvas(canvas))) { // if this is the first time create a new interval
+      var to = setInterval(function () {
+        playback(canvas, structure);
+      }, 100);
+      // add new canvas data
+      byCanvasData.set(keyFromCanvas(canvas), { interval: to, start: start });
   }
 }
 
 function loadGallery() {
-  jQuery("div.gallery").children().remove();
-  // clear out the byCanvasData
-  byCanvasData.forEach(function (value, key) {
-    clearInterval(value.interval);
-  });
-  byCanvasData = new Map();
-
-  jQuery.getJSON("getImage.php", function (data) {
-    // we get an array of structures back here, start adding playbacks
-    for (var i = 0; i < data.length; i++) {
-      jQuery("div.gallery").prepend(
-        "<div class='playback' id='IMG" +
-          i +
-          "' structure_index='" +
-          i +
-          "' title='Drawing #" +
-          i +
-          "'><canvas class='thumbnail'></canvas></div>",
-      );
-      // make canvas as big as div around it
-      var canvas = document.querySelector("#IMG" + i + " canvas.thumbnail");
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-    }
-    structures = data;
-    // now start animating all playbacks
-    jQuery("div.gallery div.playback").each(function (a) {
-      //console.log("do something for " + a); // should be the index
-      var tmp = jQuery("#IMG" + a + " canvas")[0];
-      var structure = structures[a];
-      playback(tmp, structure); // start the animation
+    // don't just remove all children, find out which once should be added/updated
+    //jQuery("div.gallery").children().remove();
+    // clear out the byCanvasData
+    //byCanvasData.forEach(function (value, key) {
+	//clearInterval(value.interval);
+    //});
+    //byCanvasData = new Map();
+    
+    jQuery.getJSON("getImage.php", function (data) {
+	// we get an array of structures back here, start adding playbacks
+	var newPlaybacks = [];
+	for (var i = 0; i < data.length; i++) {
+	    // do we have this image already? (skip, otherwise add at the beginning)
+	    if (document.getElementById("IMG"+data[i][0]) !== null)
+		continue; // already done
+	    
+	    jQuery("div.gallery").prepend(
+		"<div class='playback' id='IMG" +
+		    data[i][0] +
+		    "' structure_index='" +
+		    data[i][0] +
+		    "' title='Drawing #" +
+		    i +
+		    "'><canvas class='thumbnail'></canvas></div>",
+	    );
+	    // make canvas as big as div around it
+	    var canvas = document.querySelector("#IMG" + data[i][0] + " canvas.thumbnail");
+	    canvas.width = canvas.offsetWidth;
+	    canvas.height = canvas.offsetHeight;
+	    newPlaybacks.push([canvas, data[i][1]]);
+	}
+	structures = data;
+	// now start animating all new playbacks
+	/*jQuery("div.gallery div.playback").each(function (a) {
+	    //console.log("do something for " + a); // should be the index
+	    var k = data[a][0];
+	    var v = data[a][1];
+	    var tmp = jQuery("#IMG" + k + " canvas")[0];
+	    var structure = v;
+	    playback(tmp, structure); // start the animation
+	    }); */
+	for (var i = 0; i < newPlaybacks.length; i++) {
+	    playback(newPlaybacks[i][0], newPlaybacks[i][1]); // start the animation
+	}
     });
-  });
 }
 
 jQuery(document).ready(function () {
   // draw the gallery from all found pictures
-  loadGallery();
-
+    loadGallery();
+    setInterval(function() {
+	loadGallery();
+    }, 10000);
+    
   jQuery("div.gallery").on("click", "div.playback", function () {
     // show this one image larger
     var id = jQuery(this).attr("id");
@@ -131,7 +148,11 @@ jQuery(document).ready(function () {
       clearInterval(byCanvasData.get(keyFromCanvas(canvas)).interval);
       byCanvasData.delete(keyFromCanvas(canvas));
     }
-    playback(canvas, structures[num]);
+      // find the correct structure and play it back
+      for (var i = 0; i < structures.length; i++) {
+	  if (structures[i][0] == num)
+	      playback(canvas, structures[i][1]);
+      }
   });
 
   modalDialog.addEventListener("hide.bs.modal", function (e) {

@@ -12,8 +12,9 @@
       break;
    }
    $d = json_decode(file_get_contents($fname));
+   $fmtime = filemtime($fname);
    if ($d != null) {
-      $images[] = $d;
+      $images[] = array( $fmtime, $d );
       $counter = $counter + 1;
    }
  }
