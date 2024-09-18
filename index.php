@@ -118,7 +118,7 @@
 <?php if (isset($_GET["admin"])): ?>
                             <button
                                 type="button"
-                                class="btn btn-primary"
+                                class="btn btn-danger"
                               data-bs-dismiss="modal"
 			      id="delete-button"
                             >
