@@ -192,7 +192,7 @@ function erase(ask = true) {
     m = confirm("Clear screen?");
   }
   if (m) {
-      ctx.drawColor(Color.TRANSPARENT)
+      //ctx.drawColor(Color.TRANSPARENT)
       ctx.clearRect(0, 0, w, h);
       // start over with memorizing the drawings as well
       structure = [];
