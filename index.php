@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Draw your brain</title>
         <link rel="stylesheet" href="css/bootstrap.min.css" />
-        <link rel="stylesheet" href="css/styles.css?_=1236" />
+        <link rel="stylesheet" href="css/styles.css?_=1237" />
     </head>
     <body>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -75,7 +75,7 @@
                                 <svg class="bi me-2" width="1em" height="1em">
                                     <use xlink:href="#pencil"></use>
                                 </svg>
-                                    Draw your own brain
+                                    <span en="Draw your own brain" no="Tegne din egen hjerne"></span>
                                 </button>
                             </li>
                         </ul>
@@ -84,7 +84,7 @@
             </div>
 
             <h2 class="pb-2 border-bottom" style="margin-top: 40px">
-                Shared drawings
+                <span en="Shared drawings" no="Delte tegninger"></span>
             </h2>
             <div class="n-items-stretch g-4 py-2">
                 <div class="gallery"></div>
@@ -140,6 +140,6 @@
 
         <script src="js/bootstrap.bundle.min.js"></script>
         <script src="js/jquery-3.7.1.min.js"></script>
-        <script src="js/gallery.js?_=1236"></script>
+        <script src="js/gallery.js?_=12367"></script>
     </body>
 </html>
