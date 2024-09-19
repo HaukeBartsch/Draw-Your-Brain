@@ -6,6 +6,10 @@ var ctx = null;
 var byCanvasData = new Map();
 var svgImage = new Image();
 svgImage.src = "/images/catPaw.svg";
+var svgImage2 = new Image();
+svgImage2.src = "/images/robotPaw.svg";
+var drawSVG = svgImage;
+
 
 function keyFromCanvas(canvas) {
   var key = jQuery(canvas).parent().attr("id");
@@ -51,8 +55,9 @@ function playback(canvas, structure) {
     }
   }
   ctx.clearRect(0, 0, w, h); // clear first, draw up to the point in the structure based on now -start
-  if (jQuery(canvas).parent().attr('id') == "detailed_canvas")
+  if (jQuery(canvas).parent().attr('id') == "detailed_canvas") {
     drawPaw = true;
+  }
   // if we are after the last time don't draw the paw
   if (endTime > maxTime) {
     if (jQuery(canvas).parent().attr('id') == "detailed_canvas") {
@@ -78,7 +83,7 @@ function playback(canvas, structure) {
           ctx.stroke();
           ctx.beginPath(); // start a new path to have the paw be over the last path
           // add the drawer on this position, but only if we are in the full window mode
-          ctx.drawImage(svgImage, Math.round(d.pos[j][0] * w) + drawPawOffset[0], Math.round(d.pos[j][1] * h) + drawPawOffset[1]);
+          ctx.drawImage(drawSVG, Math.round(d.pos[j][0] * w) + drawPawOffset[0], Math.round(d.pos[j][1] * h) + drawPawOffset[1]);
         }
         break; // stop drawing here
       }
@@ -213,6 +218,15 @@ jQuery(document).ready(function () {
       clearInterval(byCanvasData.get(keyFromCanvas(canvas)).interval);
       byCanvasData.delete(keyFromCanvas(canvas));
     }
+    // set the draw paw
+    // random which draw paw
+    if (Math.random() > 0.5) {
+      drawSVG = svgImage2;
+    } else {
+      drawSVG = svgImage;
+    }
+
+
     // find the correct structure and play it back
     for (var i = 0; i < structures.length; i++) {
       if (structures[i][0] == num)

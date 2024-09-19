@@ -130,7 +130,7 @@
                                 class="btn btn-primary"
                                 data-bs-dismiss="modal"
                             >
-                                Close
+                            <span en="Close" no="Lukke">Close</span>
                             </button>
                         </div>
                     </div>
