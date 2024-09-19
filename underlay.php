@@ -3,7 +3,7 @@
 $files = glob("images/MRI/*.png");
 $erg = array();
 foreach ($files as $file) {
-    if (!str_starts_with(basename($file), "solution")) {
+    if (substr(basename($file), 0, 8) !== "solution") {
        $erg[] = basename($file);
     }
 }
