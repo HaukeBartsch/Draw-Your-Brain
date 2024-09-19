@@ -343,13 +343,42 @@ jQuery(document).ready(function () {
           jQuery('div.brainSurface').css('background-size', 'contain');
           jQuery('div.brainSurface').css('background-position', 'center');
           jQuery('div.brainSurface').css('background-repeat', 'no-repeat');
+          jQuery('#reveal-button').fadeIn(200);
+          jQuery('#ai-result').css('background', 'none');
+          jQuery('#ai-result').hide();
         };
         underlayImage.src = "/images/MRI/" + data[0]; // or pick the first
+        jQuery('div.brainSurface').attr('basename', data[0]);
       });
     } else {
       enableUnderlay = false;
       jQuery('div.brainSurface').css('background', 'none');
+      jQuery('#reveal-button').fadeOut(200);
+      jQuery('#ai-result').fadeOut(200);
     }
+  });
+
+  jQuery('#reveal-button').on('click', function() {
+    if (jQuery('#ai-result').is(":visible")) {
+      // hide again
+      jQuery('#ai-result').css('background', 'none');
+      jQuery('#ai-result').hide();
+      return;
+    }
+    jQuery('#ai-result').fadeIn(400);
+
+    // toggle the AI result
+    var nam = jQuery('div.brainSurface').attr('basename');
+    var img = new Image();
+    img.onload = function() {
+      // now its finished loading, start drawing
+      enableUnderlay = true;
+      jQuery('#ai-result').css('background-image', 'url(' + this.src + ')');
+      jQuery('#ai-result').css('background-size', 'contain');
+      jQuery('#ai-result').css('background-position', 'center');
+      jQuery('#ai-result').css('background-repeat', 'no-repeat');
+    };
+    img.src = "/images/MRI/solution " + nam; // or pick the first
   });
 
   setInterval(function() {
