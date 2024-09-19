@@ -63,8 +63,3 @@ div.color:hover {
     vertical-align: -.125em;
     fill: currentColor;
 }
-
-html {
-    overflow: hidden;
-    overscroll-behavior: none;
-}
