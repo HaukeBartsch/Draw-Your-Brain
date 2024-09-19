@@ -29,6 +29,27 @@ function getInteractionLocation(event) {
   return [x, y];
 }
 
+function switchLanguage() {
+  jQuery('span').each(function(idx, obj) {
+    var en = jQuery(obj).attr("en");
+    var no = jQuery(obj).attr("no");
+    if (typeof en == 'undefined' || typeof no=='undefined')
+      return; // ignore
+    
+    var now = jQuery(obj).text();
+    if (now == en) {
+      jQuery(obj).fadeOut(400, function() {
+        jQuery(this).text(no).fadeIn(400);
+      });
+      //jQuery(obj).text(no);
+    } else {
+      jQuery(obj).fadeOut(400, function() {
+        jQuery(this).text(en).fadeIn(400);
+      });
+    }
+  });
+}
+
 function init() {
   canvas = document.getElementById("canvas");
   ctx = canvas.getContext("2d");
@@ -330,6 +351,11 @@ jQuery(document).ready(function () {
       jQuery('div.brainSurface').css('background', 'none');
     }
   });
+
+  setInterval(function() {
+    switchLanguage();
+  }, 10000);
+  switchLanguage();
 
   color("orange"); // set start color
   init();
