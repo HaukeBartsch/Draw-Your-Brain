@@ -11,7 +11,8 @@
    if ($counter > $N) {
       break;
    }
-   $d = json_decode(file_get_contents($fname));
+   $d = json_decode(file_get_contents($fname), true);
+
    $fmtime = filemtime($fname);
    if ($d != null) {
       $images[] = array( $fmtime, $d );
