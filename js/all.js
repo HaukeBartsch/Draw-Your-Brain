@@ -13,7 +13,8 @@ var x = "black",
 var structure = []; // an array of drawing commands
 var currentCommand = {};
 var globalTime = null; // starts with the first mousedown
-
+var underlayImage = new Image();
+var enableUnderlay = false;
 
 function getInteractionLocation(event) {
   let pos = { x: event.clientX, y: event.clientY };
@@ -148,11 +149,11 @@ function init() {
   );
 
     window.onresize = function (event) {
-	canvas.width = window.innerWidth;
-	canvas.height = window.innerHeight;
-	// we should draw again in case we got cleared out
-	// a resize will clear the canvas, also remove the drawn image to make this consistent
-	erase(false);
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      // we should draw again in case we got cleared out
+      // a resize will clear the canvas, also remove the drawn image to make this consistent
+      erase(false);
     };
 }
 
@@ -197,7 +198,7 @@ function erase(ask = true) {
       currentCommand = {};
       globalTime = null;
       if (document.getElementById("canvasimg"))
-	  document.getElementById("canvasimg").style.display = "none";
+    	  document.getElementById("canvasimg").style.display = "none";
   }
 }
 
@@ -304,6 +305,29 @@ jQuery(document).ready(function () {
     setTimeout(function () {
       window.location.href = "/";
     }, 300);
+  });
+
+  jQuery('#brain').on("click", function() {
+    // the user wants to enable a random brain picture
+    if (jQuery('#brain').is(':checked')) {
+      // load an underlay
+      enableUnderlay = false;
+      jQuery.getJSON('underlay.php', function(data) {
+        // pick a random image here
+        underlayImage.onload = function() {
+          // now its finished loading, start drawing
+          enableUnderlay = true;
+          jQuery('div.brainSurface').css('background-image', 'url(' + this.src + ')');
+          jQuery('div.brainSurface').css('background-size', 'contain');
+          jQuery('div.brainSurface').css('background-position', 'center');
+          jQuery('div.brainSurface').css('background-repeat', 'no-repeat');
+        };
+        underlayImage.src = "/images/MRI/" + data[0]; // or pick the first
+      });
+    } else {
+      enableUnderlay = false;
+      jQuery('div.brainSurface').css('background', 'none');
+    }
   });
 
   color("orange"); // set start color
