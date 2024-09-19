@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Draw your brain</title>
         <link rel="stylesheet" href="css/bootstrap.min.css" />
-        <link rel="stylesheet" href="css/styles.css?_=1237" />
+        <link rel="stylesheet" href="css/styles.css?_=1238" />
     </head>
     <body>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -26,11 +26,20 @@
                     class="collapse navbar-collapse"
                     id="navbarSupportedContent"
                 >
-                  <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <div class="row">
+                  <ul class="navbar-nav me-auto mb-2 mb-lg-0 col-md">
                     <li>
-                        <p class="text-white">Learn more about the <a href="https://mmiv.no/">Mohn Medical Imaging and Visualization Centre (MMIV)</a>, a collaboration between the University of Bergen and the Haukeland University Hospital.</p>
+                        <p class="text-white">Learn more about the <a style="color: white;" href="https://mmiv.no/">Mohn Medical Imaging and Visualization Centre (MMIV)</a>, a collaboration between the University of Bergen and the Haukeland University Hospital.</p>
                     </li>
                   </ul>
+                  <ul class="navbar-nav me-auto mb-2 mb-lg-0 col-md">
+                    <li>
+                    <p class="text-white" style="text-align: right;">
+                           <image src="images/QR.png" width="100px" height="auto">
+                    </p>
+                    </li>
+                  </ul>   
+</div>
                 </div>
             </div>
         </nav>
@@ -140,6 +149,6 @@
 
         <script src="js/bootstrap.bundle.min.js"></script>
         <script src="js/jquery-3.7.1.min.js"></script>
-        <script src="js/gallery.js?_=12367"></script>
+        <script src="js/gallery.js?_=12368"></script>
     </body>
 </html>
