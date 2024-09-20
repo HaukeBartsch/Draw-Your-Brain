@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>paint brain</title>
   <link rel="stylesheet" href="css/bootstrap.min.css">
-  <link rel="stylesheet" href="css/styles.css?_=111">
+  <link rel="stylesheet" href="css/styles.css?_=1116">
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -80,33 +80,38 @@
   </svg>
   
   <div class="container my-5">
-    <div class="brainSurface">
-      <div class="tools">
-        <div class="color" style="background-color: orange;"></div>
-        <div class="color" style="background-color: limegreen;"></div>
-        <div class="color" style="background-color: #85C1E9;"></div>
-        <div class="color" style="background-color: white;"></div>
-        <!-- <div class="option" id="text">T</div> -->
-        <button class="option btn btn-secondary btn-sm" id="clear"><span en="Clear" no="Fjerne"></span></button>&nbsp;
-        <input type="checkbox" class="btn-check option" id="brain">
-        <label class="btn btn-sm btn-secondary" for="brain">
-          <svg class="bi" width="1em" height="1em">
-            <use xlink:href="#brain-icon"></use>
-          </svg>
-          <span en="Brain" no="Hjerne"></span></label>
+    <div class="row">
+      <div class="col-md">
+       <div class="brainSurface">
+        <div class="tools">
+          <div class="color" style="background-color: orange;"></div>
+          <div class="color" style="background-color: limegreen;"></div>
+          <div class="color" style="background-color: #85C1E9;"></div>
+          <div class="color" style="background-color: white;"></div>
+          <!-- <div class="option" id="text">T</div> -->
+          <button class="option btn btn-secondary btn-sm" id="clear"><span en="Clear" no="Fjerne"></span></button>&nbsp;
+          <input type="checkbox" class="btn-check option" id="brain">
+          <label class="btn btn-sm btn-secondary" for="brain">
+            <svg class="bi" width="1em" height="1em">
+              <use xlink:href="#brain-icon"></use>
+            </svg>
+            <span en="Brain" no="Hjerne"></span>
+          </label>
           <button class="option btn btn-primary btn-sm" id="share"><span en="Share" no="Dele"></span></button>
         </div>
         <canvas id="canvas"></canvas>
+       </div>
       </div>
-      <div style="vertical-align: center;">
+      <div style="vertical-align: center;" class="col-md">
         <button class="btn btn-secondary btn-lg" id="reveal-button" style="width: 100%; margin-top: 10px; background-color: rgba(100,100,100,0.3); border: 0px; display: none;"><span en="Reveal AI" no="Avsløre KI-resultatet"></span></button>
       </div>
-      <div id="ai-result" style="display: none;"></div>
+      <div id="ai-result" style="display: none;" class="col-md"></div>
     </div>
+  </div>
     
-    <script src="js/bootstrap.bundle.min.js"></script>
-    <script src="js/jquery-3.7.1.min.js"></script>
-    <script src="js/all.js?_=1238"></script>
-  </body>
-  </html>
+  <script src="js/bootstrap.bundle.min.js"></script>
+  <script src="js/jquery-3.7.1.min.js"></script>
+  <script src="js/all.js?_=123899"></script>
+</body>
+</html>
   

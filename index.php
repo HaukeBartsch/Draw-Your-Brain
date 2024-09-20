@@ -27,6 +27,11 @@
                     id="navbarSupportedContent"
                 >
                 <div class="row">
+                    <ul class="navbar-nav col-md">&nbsp;
+                    <li>
+
+
+</ul>
                   <ul class="navbar-nav me-auto mb-2 mb-lg-0 col-md">
                     <li>
                         <p class="text-white">Learn more about the <a style="color: white;" href="https://mmiv.no/">Mohn Medical Imaging and Visualization Centre (MMIV)</a>, a collaboration between the University of Bergen and the Haukeland University Hospital.</p>

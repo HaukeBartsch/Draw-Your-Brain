@@ -1,14 +1,15 @@
 var canvas,
-  ctx,
-  flag = false,
-  prevX = 0,
-  currX = 0,
-  prevY = 0,
-  currY = 0,
-  dot_flag = false;
+ctx,
+flag = false,
+prevX = 0,
+currX = 0,
+prevY = 0,
+currY = 0,
+dot_flag = false;
+var w, h;
 
 var x = "black",
-  y = 6;
+y = 6;
 
 var structure = []; // an array of drawing commands
 var currentCommand = {};
@@ -19,14 +20,14 @@ var enableUnderlay = false;
 function getInteractionLocation(event) {
   let pos = { x: event.clientX, y: event.clientY };
   if (event.touches) {
-      pos = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+    pos = { x: event.touches[0].clientX, y: event.touches[0].clientY };
   }
   const rect = event.target.getBoundingClientRect();
   const x_rel = pos.x - rect.left;
   const y_rel = pos.y - rect.top;
-  const x = Math.round((x_rel * event.target.width) / rect.width);
-  const y = Math.round((y_rel * event.target.height) / rect.height);
-  return [x, y];
+  const xv = Math.round((x_rel * event.target.width) / rect.width);
+  const yv = Math.round((y_rel * event.target.height) / rect.height);
+  return [xv, yv];
 }
 
 function switchLanguage() {
@@ -54,27 +55,27 @@ function init() {
   canvas = document.getElementById("canvas");
   ctx = canvas.getContext("2d");
   w = canvas.width;
-  h = canvas.height;
-
-    canvas.addEventListener(
-        "touchmove",
-        function(e) {
-            findxy("move", e);
-            if (flag) {
-                if (typeof currentCommand.pos == "undefined") {
-                    currentCommand.pos = [];
-                }
-                if (globalTime != null)
-                    currentCommand.pos.push([
-                        currX / w,
-                        currY / h,
-                        new Date() - globalTime,
-                    ]);
-            }
-        },
-        false,
-    );
-    
+  h = getHeightFromAR(w);
+  
+  canvas.addEventListener(
+    "touchmove",
+    function(e) {
+      findxy("move", e);
+      if (flag) {
+        if (typeof currentCommand.pos == "undefined") {
+          currentCommand.pos = [];
+        }
+        if (globalTime != null)
+          currentCommand.pos.push([
+          currX / w,
+          currY / h,
+          new Date() - globalTime,
+        ]);
+      }
+    },
+    false,
+  );
+  
   canvas.addEventListener(
     "mousemove",
     function (e) {
@@ -85,28 +86,28 @@ function init() {
         }
         if (globalTime != null)
           currentCommand.pos.push([
-            currX / w,
-            currY / h,
-            new Date() - globalTime,
-          ]);
+          currX / w,
+          currY / h,
+          new Date() - globalTime,
+        ]);
       }
     },
     false,
   );
-    canvas.addEventListener(
-        "touchstart",
-        function(e) {
-            findxy("down", e);
-            if (globalTime == null) {
-                globalTime = new Date();
-            }
-            currentCommand.color = x;
-            currentCommand.lineWidth = y;
-        },
-        false,
-    );
-
-    
+  canvas.addEventListener(
+    "touchstart",
+    function(e) {
+      findxy("down", e);
+      if (globalTime == null) {
+        globalTime = new Date();
+      }
+      currentCommand.color = x;
+      currentCommand.lineWidth = y;
+    },
+    false,
+  );
+  
+  
   canvas.addEventListener(
     "mousedown",
     function (e) {
@@ -129,53 +130,77 @@ function init() {
       }
       if (globalTime != null)
         currentCommand.pos.push([
-          currX / w,
-          currY / h,
-          new Date() - globalTime,
-        ]);
-
+        currX / w,
+        currY / h,
+        new Date() - globalTime,
+      ]);
+      
       structure.push(JSON.parse(JSON.stringify(currentCommand))); // trivial copy
       currentCommand = {}; // clear again
     },
     false,
   );
-    canvas.addEventListener(
-        "touchend",
-        function(e) {
-            findxy("up", e);
-            // store the last mouse position as well                                                                                            
-            if (typeof currentCommand.pos == "undefined") {
-                currentCommand.pos = [];
-            }
-            if (globalTime != null)
-                currentCommand.pos.push([
-                    currX / w,
-                    currY / h,
-                    new Date() - globalTime,
-                ]);
-
-            structure.push(JSON.parse(JSON.stringify(currentCommand))); // trivial copy                                                         
-            currentCommand = {}; // clear again                                                                                                 
-        },
-        false,
-    );
-
-
-    canvas.addEventListener(
+  canvas.addEventListener(
+    "touchend",
+    function(e) {
+      findxy("up", e);
+      // store the last mouse position as well                                                                                            
+      if (typeof currentCommand.pos == "undefined") {
+        currentCommand.pos = [];
+      }
+      if (globalTime != null)
+        currentCommand.pos.push([
+        currX / w,
+        currY / h,
+        new Date() - globalTime,
+      ]);
+      
+      structure.push(JSON.parse(JSON.stringify(currentCommand))); // trivial copy                                                         
+      currentCommand = {}; // clear again                                                                                                 
+    },
+    false,
+  );
+  
+  
+  canvas.addEventListener(
     "mouseout",
     function (e) {
       findxy("out", e);
     },
     false,
   );
+  
+  window.onresize = function (event) {
+    canvas.width = window.innerWidth;
+    canvas.height = getHeightFromAR(canvas.width);
 
-    window.onresize = function (event) {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      // we should draw again in case we got cleared out
-      // a resize will clear the canvas, also remove the drawn image to make this consistent
-      erase(false);
-    };
+    // canvas.height = window.innerHeight; // keep the aspect ratio in place so we always use the same frame of reference 0..1
+    w = canvas.width;
+    h = canvas.height;
+    // we should draw again in case we got cleared out
+    // a resize will have cleared the canvas, also remove the drawn image to make this consistent
+    // instead of clearing the image we should draw it again.
+    ctx = canvas.getContext("2d");
+    ctx.lineCap = "round";
+    for (var i = 0; i < structure.length; i++) {
+      var d = structure[i];
+      if (typeof d.pos == "undefined") continue;
+      // set color and line, start drawing pos values
+      ctx.beginPath();
+      ctx.moveTo(Math.round(d.pos[0][0] * w), Math.round(d.pos[0][1] * h));
+      for (var j = 1; j < d.pos.length; j++) {
+        // find out if we should still draw
+        ctx.lineTo(Math.round(d.pos[j][0] * w), Math.round(d.pos[j][1] * h));
+      }
+      ctx.lineWidth = d.lineWidth;
+      ctx.strokeStyle = d.color;
+      ctx.stroke();
+    }
+  };
+}
+
+function getHeightFromAR(width) {
+  return Math.round((719 * width ) / 897);
 }
 
 function color(obj) {
@@ -188,11 +213,11 @@ function getMousePos(canvas, evt) {
     x: erg[0],
     y: erg[1]
   };
-/*
+  /*
   var rect = canvas.getBoundingClientRect();
   return {
-    x: evt.clientX - rect.left,
-    y: evt.clientY - rect.top,
+  x: evt.clientX - rect.left,
+  y: evt.clientY - rect.top,
   }; */
 }
 
@@ -213,22 +238,22 @@ function erase(ask = true) {
     m = confirm("Clear screen?");
   }
   if (m) {
-      //ctx.drawColor(Color.TRANSPARENT)
-      ctx.clearRect(0, 0, w, h);
-      // start over with memorizing the drawings as well
-      structure = [];
-      currentCommand = {};
-      globalTime = null;
-      if (document.getElementById("canvasimg"))
-    	  document.getElementById("canvasimg").style.display = "none";
+    //ctx.drawColor(Color.TRANSPARENT)
+    ctx.clearRect(0, 0, w, h);
+    // start over with memorizing the drawings as well
+    structure = [];
+    currentCommand = {};
+    globalTime = null;
+    if (document.getElementById("canvasimg"))
+      document.getElementById("canvasimg").style.display = "none";
   }
 }
 
 /*function save() {
-    document.getElementById("canvasimg").style.border = "2px solid";
-    var dataURL = canvas.toDataURL();
-    document.getElementById("canvasimg").src = dataURL;
-    document.getElementById("canvasimg").style.display = "inline";
+document.getElementById("canvasimg").style.border = "2px solid";
+var dataURL = canvas.toDataURL();
+document.getElementById("canvasimg").src = dataURL;
+document.getElementById("canvasimg").style.display = "inline";
 }*/
 
 function findxy(res, e) {
@@ -238,7 +263,7 @@ function findxy(res, e) {
     pos = getMousePos(canvas, e);
     currX = pos.x; // e.clientX - canvas.offsetLeft;
     currY = pos.y; // e.clientY - canvas.offsetTop;
-
+    
     flag = true;
     dot_flag = true;
     if (dot_flag) {
@@ -298,27 +323,30 @@ jQuery(document).ready(function () {
   // make the canvas fill its parent
   var canvas = document.querySelector("#canvas");
   canvas.width = canvas.offsetWidth;
-  canvas.height = canvas.offsetHeight;
-
+  canvas.height = getHeightFromAR(canvas.width);
+  //canvas.height = canvas.offsetHeight;
+  
   jQuery("div.color").on("click", function () {
     var col = jQuery(this).css("background-color"); // get back a color
     color(col);
   });
-
+  
   jQuery("#clear").on("click", function () {
-    erase();
+    setTimeout(function() {
+      erase();
+    }, 100);
   });
-
+  
   jQuery("#share").on("click", function () {
     var streamlined = simplify(structure);
-
+    
     // safe the current image as a structure of how to draw
     jQuery
-      .post("saveImage.php", { data: JSON.stringify(streamlined) })
-      .done(function (data) {
-        // returned value is
-        console.log("got something back " + JSON.stringify(data));
-      });
+    .post("saveImage.php", { data: JSON.stringify(streamlined) })
+    .done(function (data) {
+      // returned value is
+      console.log("got something back " + JSON.stringify(data));
+    });
     // and clear the screen again, reset everything or redirect
     structure = [];
     currentCommand = {};
@@ -328,7 +356,7 @@ jQuery(document).ready(function () {
       window.location.href = "/";
     }, 300);
   });
-
+  
   jQuery('#brain').on("click", function() {
     // the user wants to enable a random brain picture
     if (jQuery('#brain').is(':checked')) {
@@ -357,7 +385,7 @@ jQuery(document).ready(function () {
       jQuery('#ai-result').fadeOut(200);
     }
   });
-
+  
   jQuery('#reveal-button').on('click', function() {
     if (jQuery('#ai-result').is(":visible")) {
       // hide again
@@ -366,7 +394,7 @@ jQuery(document).ready(function () {
       return;
     }
     jQuery('#ai-result').fadeIn(400);
-
+    
     // toggle the AI result
     var nam = jQuery('div.brainSurface').attr('basename');
     var img = new Image();
@@ -380,12 +408,12 @@ jQuery(document).ready(function () {
     };
     img.src = "/images/MRI/solution " + nam; // or pick the first
   });
-
+  
   setInterval(function() {
     switchLanguage();
   }, 10000);
   switchLanguage();
-
+  
   color("orange"); // set start color
   init();
 });
