@@ -1,4 +1,10 @@
 <?php
+
+if (version_compare(phpversion(), '7.1', '>=')) {
+    ini_set( 'precision', 17 );
+    ini_set( 'serialize_precision', -1 );
+}
+
 // save an image submitted just now in the data folder
 $output = "data";
 
@@ -47,7 +53,6 @@ if (isset($_POST['data'])) {
         $ar[1] += $miy;
     }
   }
-
 
   $fname = $output. "/". date("Y-m-d\\TH:i:sP").".code";
   file_put_contents($fname, json_encode($d));

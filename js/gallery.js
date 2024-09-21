@@ -20,6 +20,9 @@ function keyFromCanvas(canvas) {
 }
 
 function playback(canvas, structure) {
+  if (structure.length < 1 || typeof structure[structure.length - 1].pos == "undefined" || structure[structure.length - 1].pos.length < 2)
+    return; // do nothing
+  
   // what is the length of this structures display?
   var start = null;
   if (byCanvasData.has(keyFromCanvas(canvas))) {
@@ -28,10 +31,15 @@ function playback(canvas, structure) {
     start = new Date();
   }
   
-  var maxTime =
-  structure[structure.length - 1].pos[
-    structure[structure.length - 1].pos.length - 1
-  ][2];
+  var maxTime = 0;
+  try {
+    maxTime =
+    structure[structure.length - 1].pos[
+      structure[structure.length - 1].pos.length - 1
+    ][2];
+  } catch(e) {
+    return;
+  }
   
   // based on the structure we need to do what?
   ctx = canvas.getContext("2d");
@@ -71,6 +79,7 @@ function playback(canvas, structure) {
   for (var i = 0; i < structure.length; i++) {
     var d = structure[i];
     if (typeof d.pos == "undefined") continue;
+    if (typeof d.pos.length < 2) continue;
     // set color and line, start drawing pos values
     ctx.beginPath();
     ctx.moveTo(Math.round(d.pos[0][0] * w), Math.round(d.pos[0][1] * h));
@@ -225,8 +234,8 @@ jQuery(document).ready(function () {
     } else {
       drawSVG = svgImage;
     }
-
-
+    
+    
     // find the correct structure and play it back
     for (var i = 0; i < structures.length; i++) {
       if (structures[i][0] == num)
