@@ -42,3 +42,7 @@ All drawings are stored as JSON encoded texts that include the position and colo
 ```
 
 The third element in the position array of arrays encodes for the timing of a stroke up to this position. In the example above 22 milliseconds after the first coordinate a second coordinate was saved. All positions are encoded as values between 0 and 1.
+
+### System setup
+
+We use a virtual machine provided by the University of Bergen to host the application. The system in 2025 was a minimum sized debian 13 system with apache2 and php8.4 installed. We used fail2ban to secure the remote access (ssh with private/public keys). 
