@@ -12,7 +12,7 @@ Citation: Hernandez Petzsche, M.R., de la Rosa, E., Hanning, U. et al. ISLES 202
 
 ### Story
 
-We used this application during the Research Days in Bergen, Norway in September of 2024.
+We used this application during the Research Days in Bergen, Norway in September of 2024/2025.
 
 ![example](https://github.com/HaukeBartsch/Draw-Your-Brain/raw/main/images/AfterDay2.gif)
 
@@ -41,4 +41,4 @@ All drawings are stored as JSON encoded texts that include the position and colo
 ...
 ```
 
-The third element in the position array of arrays encodes for the timing of a stroke up to this position. In the example above 22 milliseconds after the first coordinate a second coordinate was safed. All positions are encoded as values between 0 and 1 to abstract from the size of the drawing canvas (on phone or screen device).
+The third element in the position array of arrays encodes for the timing of a stroke up to this position. In the example above 22 milliseconds after the first coordinate a second coordinate was saved. All positions are encoded as values between 0 and 1.
