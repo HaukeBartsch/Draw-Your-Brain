@@ -319,6 +319,23 @@ function simplify(structures) {
   return betterStructures;
 }
 
+function accelerate(structures, factor = 0.5) {
+  // adjust the times go make the animation faster or slower
+  if (structures.length == 0) return structures;
+  var betterStructures = [];
+  for (var i = 0; i < structures.length; i++) {
+    var structure = structures[i];
+
+    var c = JSON.parse(JSON.stringify(structure)); // make a copy
+    for (var j = 0; j < c["pos"].length; j++) {
+      // adjust the times
+      c["pos"][j][2] *= factor;
+    }
+    betterStructures.push(c);
+  }
+  return betterStructures;
+}
+
 jQuery(document).ready(function () {
   // make the canvas fill its parent
   var canvas = document.querySelector("#canvas");
@@ -339,6 +356,7 @@ jQuery(document).ready(function () {
   
   jQuery("#share").on("click", function () {
     var streamlined = simplify(structure);
+    streamlined = accelerate(streamlined, 0.5);
     
     // safe the current image as a structure of how to draw
     jQuery
