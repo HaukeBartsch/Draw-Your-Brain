@@ -21,7 +21,7 @@ function keyFromCanvas(canvas) {
 
 function playback(canvas, structure) {
   if (structure.length < 1 || typeof structure[structure.length - 1].pos == "undefined" /*|| structure[structure.length - 1].pos.length < 2 */)
-    return; // do nothing
+    return; // do nothing 
   
   // what is the length of this structures display?
   var start = null;
