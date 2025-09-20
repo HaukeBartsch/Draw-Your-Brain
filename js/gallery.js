@@ -79,10 +79,21 @@ function playback(canvas, structure) {
   for (var i = 0; i < structure.length; i++) {
     var d = structure[i];
     if (typeof d.pos == "undefined") continue;
-    if (typeof d.pos.length < 2) continue;
+    if (typeof d.pos.length < 1) continue;
     // set color and line, start drawing pos values
     ctx.beginPath();
     ctx.moveTo(Math.round(d.pos[0][0] * w), Math.round(d.pos[0][1] * h));
+    if (d.pos.length == 1) {
+        if (drawPaw) {
+          ctx.lineWidth = w < 200 ? 1 : d.lineWidth;
+          ctx.strokeStyle = d.color;
+          ctx.stroke();
+          ctx.beginPath(); // start a new path to have the paw be over the last path
+          // add the drawer on this position, but only if we are in the full window mode
+          ctx.drawImage(drawSVG, Math.round(d.pos[0][0] * w) + drawPawOffset[0], Math.round(d.pos[0][1] * h) + drawPawOffset[1]);
+        }
+        ctx.lineTo(Math.round(d.pos[0][0] * w), Math.round(d.pos[0][1] * h));
+    }
     for (var j = 1; j < d.pos.length; j++) {
       // find out if we should still draw
       if (d.pos[j][2] > endTime) {
