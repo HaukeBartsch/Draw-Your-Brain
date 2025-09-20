@@ -90,7 +90,7 @@ function playback(canvas, structure) {
           ctx.stroke();
           ctx.beginPath(); // start a new path to have the paw be over the last path
           // add the drawer on this position, but only if we are in the full window mode
-          ctx.drawImage(drawSVG, Math.round(d.pos[0][0] * w) + drawPawOffset[0], Math.round(d.pos[0][1] * h) + drawPawOffset[1]);
+          //ctx.drawImage(drawSVG, Math.round(d.pos[0][0] * w) + drawPawOffset[0], Math.round(d.pos[0][1] * h) + drawPawOffset[1]);
         }
         ctx.lineTo(Math.round(d.pos[0][0] * w), Math.round(d.pos[0][1] * h));
     }
