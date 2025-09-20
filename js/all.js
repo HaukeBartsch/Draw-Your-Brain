@@ -432,6 +432,9 @@ jQuery(document).ready(function () {
   }, 10000);
   switchLanguage();
   
-  color("orange"); // set start color
+  let possible_colors = [ "orange", "limegreen", "#85C1E9", "black" ];
+  let col = possible_colors[Math.floor(Math.random() * possible_colors.length)];
+  color(col); // set start color
   init();
 });
+ 
