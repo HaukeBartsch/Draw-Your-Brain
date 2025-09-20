@@ -79,7 +79,7 @@ function playback(canvas, structure) {
   for (var i = 0; i < structure.length; i++) {
     var d = structure[i];
     if (typeof d.pos == "undefined") continue;
-    if (typeof d.pos.length < 1) continue;
+    if (d.pos.length < 1) continue;
     // set color and line, start drawing pos values
     ctx.beginPath();
     ctx.moveTo(Math.round(d.pos[0][0] * w), Math.round(d.pos[0][1] * h));
