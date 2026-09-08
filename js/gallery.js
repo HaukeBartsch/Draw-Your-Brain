@@ -10,6 +10,35 @@ var svgImage2 = new Image();
 svgImage2.src = "/images/robotPaw.svg";
 var drawSVG = svgImage;
 
+function handleVisibilityChange() {
+  if (document.hidden) {
+    // 1. Clear the timer when the window is hidden
+    clearTimeout(timerId);
+    console.log("Tab hidden. Timer paused/cleared.");
+  } else {
+    // 2. Restart the timer when the window becomes visible again
+    startTimer();
+    console.log("Tab visible. Timer restarted.");
+  }
+}
+
+let timerId = null;
+const DELAY = 5000;
+
+function startTimer() {
+  // Clear any existing timer first to avoid duplicates
+  if (timerId) clearTimeout(timerId); 
+  // delete all the existing drawings and reload the gallery
+  byCanvasData.forEach(function (value, key) {
+    clearInterval(value.interval);
+  });
+  byCanvasData = new Map();
+  jQuery("div.gallery").children().remove();
+  loadGallery();
+  timerId = setTimeout(() => {
+      console.log("Timer finished!");
+  }, DELAY);
+}
 
 function keyFromCanvas(canvas) {
   var key = jQuery(canvas).parent().attr("id");
@@ -282,7 +311,8 @@ jQuery(document).ready(function () {
       console.log("done");
     });
   });
-  
+
+  document.addEventListener("visibilitychange", handleVisibilityChange);
   setInterval(function() {
     switchLanguage();
   }, 10000);

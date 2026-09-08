@@ -426,7 +426,7 @@ jQuery(document).ready(function () {
     };
     img.src = "/images/MRI/solution " + nam; // or pick the first
   });
-  
+
   setInterval(function() {
     switchLanguage();
   }, 10000);
