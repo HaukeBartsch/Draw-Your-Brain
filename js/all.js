@@ -155,12 +155,12 @@ function init() {
         new Date() - globalTime,
       ]);
       
-      structure.push(JSON.parse(JSON.stringify(currentCommand))); // trivial copy                                                         
-      currentCommand = {}; // clear again                                                                                                 
+      structure.push(JSON.parse(JSON.stringify(currentCommand))); // trivial copy
+      currentCommand = {}; // clear again
     },
     false,
   );
-  
+
   
   canvas.addEventListener(
     "mouseout",
@@ -183,18 +183,7 @@ function init() {
     ctx = canvas.getContext("2d");
     ctx.lineCap = "round";
     for (var i = 0; i < structure.length; i++) {
-      var d = structure[i];
-      if (typeof d.pos == "undefined") continue;
-      // set color and line, start drawing pos values
-      ctx.beginPath();
-      ctx.moveTo(Math.round(d.pos[0][0] * w), Math.round(d.pos[0][1] * h));
-      for (var j = 1; j < d.pos.length; j++) {
-        // find out if we should still draw
-        ctx.lineTo(Math.round(d.pos[j][0] * w), Math.round(d.pos[j][1] * h));
-      }
-      ctx.lineWidth = d.lineWidth;
-      ctx.strokeStyle = d.color;
-      ctx.stroke();
+      drawStroke(structure[i]); // set color, line and opacity, draw all pos values
     }
   };
 }
@@ -232,6 +221,22 @@ function draw() {
   ctx.closePath();
 }
 
+// draw a complete stroke (human or AI) from the structure format
+function drawStroke(d) {
+  if (typeof d.pos == "undefined" || d.pos.length < 1) return;
+  ctx.lineCap = "round";
+  if (typeof d.opacity != "undefined") ctx.globalAlpha = d.opacity;
+  ctx.beginPath();
+  ctx.moveTo(Math.round(d.pos[0][0] * w), Math.round(d.pos[0][1] * h));
+  for (var j = 1; j < d.pos.length; j++) {
+    ctx.lineTo(Math.round(d.pos[j][0] * w), Math.round(d.pos[j][1] * h));
+  }
+  ctx.lineWidth = d.lineWidth;
+  ctx.strokeStyle = d.color;
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+}
+
 function erase(ask = true) {
   var m = true;
   if (ask) {
@@ -247,6 +252,64 @@ function erase(ask = true) {
     if (document.getElementById("canvasimg"))
       document.getElementById("canvasimg").style.display = "none";
   }
+}
+
+// ---- FLUX.2 (ai2/) : re-imagine the finished drawing on "Share" ----
+var flux2Busy = false;
+var flux2Modal = null;
+
+function flux2ShowBusy(text) {
+  jQuery("#flux2-busy-text").text(text);
+  jQuery("#flux2-busy").css("display", "flex");
+}
+function flux2HideBusy() {
+  jQuery("#flux2-busy").css("display", "none");
+}
+
+function flux2ModalShow() {
+  flux2Modal = flux2Modal || new bootstrap.Modal("#flux2-result");
+  flux2Modal.show();
+}
+function flux2ModalHide() {
+  if (flux2Modal) flux2Modal.hide();
+}
+
+// Save the drawing (.code).  That's all the browser does.  The independent
+// AI worker (ai2/worker.py, run by cron) polls data/ for this .code without a
+// .png and generates the finished image next to it (data/<id>.png) in the
+// background — so the browser returns immediately.
+function shareDrawing() {
+  if (flux2Busy) return;
+  flux2Busy = true;
+  flux2ShowBusy("Saving your drawing (the AI re-imagining runs in the background)…");
+  var streamlined = simplify(structure);
+  streamlined = accelerate(streamlined, 0.5);
+  jQuery.post("share.php", { data: JSON.stringify(streamlined) })
+    .done(function (data) {
+      flux2HideBusy();
+      if (data && data.ok) {
+        flux2Confirm("ok", "Saved as " + data.id + ". The AI (FLUX.2) will " +
+                 "generate the finished image in the background and save it " +
+                 "next to your drawing.");
+      } else {
+        flux2Confirm("error", (data && data.error) || "saving failed");
+      }
+    })
+    .fail(function () {
+      flux2HideBusy();
+      flux2Confirm("error", "saving failed (server error)");
+    })
+    .always(function () {
+      flux2Busy = false;
+    });
+}
+
+function flux2Confirm(type, msg) {
+  var el = jQuery("#flux2-confirm-msg");
+  el.removeClass("text-danger text-success")
+    .addClass(type === "error" ? "text-danger" : "text-success");
+  el.text(msg);
+  flux2ModalShow();
 }
 
 /*function save() {
@@ -353,26 +416,20 @@ jQuery(document).ready(function () {
       erase();
     }, 100);
   });
-  
+
   jQuery("#share").on("click", function () {
-    var streamlined = simplify(structure);
-    streamlined = accelerate(streamlined, 0.5);
-    
-    // safe the current image as a structure of how to draw
-    jQuery
-    .post("saveImage.php", { data: JSON.stringify(streamlined) })
-    .done(function (data) {
-      // returned value is
-      console.log("got something back " + JSON.stringify(data));
-    });
-    // and clear the screen again, reset everything or redirect
-    structure = [];
-    currentCommand = {};
-    erase(false); // do not ask
-    // and go back
-    setTimeout(function () {
-      window.location.href = "/";
-    }, 300);
+    if (structure.length < 1) return; // nothing drawn yet
+    // save the drawing (.code); the ai2/ worker (via cron) generates the image in the background
+    shareDrawing();
+  });
+
+  // FLUX.2 result modal buttons
+  jQuery("#flux2-go-gallery").on("click", function () {
+    window.location.href = "/";
+  });
+  jQuery("#flux2-keep").on("click", function () {
+    flux2ModalHide();
+    erase(false); // clear the canvas for a fresh drawing
   });
   
   jQuery('#brain').on("click", function() {

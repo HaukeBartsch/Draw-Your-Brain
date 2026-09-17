@@ -109,6 +109,8 @@ function playback(canvas, structure) {
     var d = structure[i];
     if (typeof d.pos == "undefined") continue;
     if (d.pos.length < 1) continue;
+    // respect per-stroke opacity (e.g. pencil-style AI strokes)
+    ctx.globalAlpha = typeof d.opacity == "undefined" ? 1 : d.opacity;
     // set color and line, start drawing pos values
     ctx.beginPath();
     ctx.moveTo(Math.round(d.pos[0][0] * w), Math.round(d.pos[0][1] * h));

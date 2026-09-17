@@ -154,6 +154,6 @@
 
         <script src="js/bootstrap.bundle.min.js"></script>
         <script src="js/jquery-3.7.1.min.js"></script>
-        <script src="js/gallery.js?_=12368"></script>
+        <script src="js/gallery.js?_=12368a"></script>
     </body>
 </html>

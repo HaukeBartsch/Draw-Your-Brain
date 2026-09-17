@@ -109,10 +109,43 @@
       <div id="ai-result" style="display: none;" class="col-md"></div>
     </div>
   </div>
-    
+
+  <!-- FLUX.2 (ai2/) — busy overlay shown while the model generates on the CPU -->
+  <div id="flux2-busy" style="display: none; position: fixed; inset: 0; z-index: 3000;
+       background: rgba(0,0,0,0.6); color: #fff; align-items: center;
+       justify-content: center; flex-direction: column; text-align: center; padding: 24px;">
+    <div class="spinner-border text-light mb-3" role="status" aria-hidden="true"></div>
+    <div id="flux2-busy-text" style="max-width: 540px; font-size: 1.05rem; line-height: 1.5;"></div>
+  </div>
+
+  <!-- FLUX.2 (ai2/) — save confirmation (the AI image is generated in the background by the ai2/ worker) -->
+  <div class="modal fade" tabindex="-1" id="flux2-result" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <span en="AI re-imagining" no="KI-omgjøring">AI re-imagining</span>
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+          <div id="flux2-confirm-msg" class="lead"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="flux2-keep">
+            <span en="Keep drawing" no="Fortsett å tegne">Keep drawing</span>
+          </button>
+          <button type="button" class="btn btn-primary" id="flux2-go-gallery">
+            <span en="Go to gallery" no="Til galleriet">Go to gallery</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="js/bootstrap.bundle.min.js"></script>
   <script src="js/jquery-3.7.1.min.js"></script>
-  <script src="js/all.js?_=123899"></script>
+  <script src="js/all.js?_=123899a"></script>
 </body>
 </html>
   
