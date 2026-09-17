@@ -195,3 +195,20 @@ for the VAE and activations.
 | `predict.py`    | CLI entry point (sketch → PNG, JSON contract)              |
 | `start_worker.sh` | launch `worker.py --watch` as a background daemon        |
 | `requirements.txt` | Python dependencies (CPU torch installed separately)     |
+
+
+### Setup on a new machine
+
+Make sure the users .cache directory has sufficient space (500gb).
+
+```bash
+export HF_TOKEN=XXXXXTOKENXXXXXXX
+cd ai2
+apt install python3-pip
+apt install python3-venv
+python3 -m venv .venv
+.venv/bin/pip install torch --index-url https://download.pytorch.org/whl/cpu
+.venv/bin/pip install -r requirements.txt
+./ai2/venv/bin/python ai2/worker.py --max-jobs 2
+```
+

@@ -15,7 +15,10 @@
 
    $fmtime = filemtime($fname);
    if ($d != null) {
-      $images[] = array( $fmtime, $d );
+      // a .png next to the .code (same stem) is the finished image
+      $png = preg_replace('/\.code$/', '.png', $fname);
+      $pngUrl = file_exists($png) ? rawurlencode($png) : null;
+      $images[] = array( $fmtime, $d, $pngUrl );
       $counter = $counter + 1;
    }
  }

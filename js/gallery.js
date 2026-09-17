@@ -48,10 +48,16 @@ function keyFromCanvas(canvas) {
   return canvas; // fallback in case we do not have a valid id
 }
 
-function playback(canvas, structure) {
+function playback(canvas, structure, pngUrl) {
   if (structure.length < 1 || typeof structure[structure.length - 1].pos == "undefined" /*|| structure[structure.length - 1].pos.length < 2 */)
-    return; // do nothing 
-  
+    return; // do nothing
+
+  // remember the finished image (if any) on the canvas, the interval closure
+  // only passes (canvas, structure)
+  if (typeof pngUrl != "undefined") {
+    canvas._pngUrl = pngUrl;
+  }
+
   // what is the length of this structures display?
   var start = null;
   if (byCanvasData.has(keyFromCanvas(canvas))) {
@@ -92,9 +98,49 @@ function playback(canvas, structure) {
     }
   }
   ctx.clearRect(0, 0, w, h); // clear first, draw up to the point in the structure based on now -start
-  if (jQuery(canvas).parent().attr('id') == "detailed_canvas") {
+  var isDetailed = jQuery(canvas).parent().attr('id') == "detailed_canvas";
+  if (isDetailed) {
     drawPaw = true;
   }
+
+  // in the detailed viewer, once the drawing is finished, blend it into the
+  // finished .png image (if one exists): the png fades in as background while
+  // the strokes fade out
+  var strokeFade = 1;
+  if (isDetailed && endTime > maxTime && canvas._pngUrl) {
+    if (canvas._pngImg) {
+      // image is loaded, run the crossfade
+      var BLEND_MS = 1500;
+      var p = Math.min(1, (new Date() - canvas._blendStart) / BLEND_MS);
+      p = p * p * (3 - 2 * p); // smoothstep easing
+      ctx.globalAlpha = p;
+      ctx.drawImage(canvas._pngImg, 0, 0, w, h);
+      strokeFade = 1 - p;
+      if (p >= 1) {
+        // the png is the final frame, stop redrawing
+        var kd = keyFromCanvas(canvas);
+        if (byCanvasData.has(kd)) {
+          clearInterval(byCanvasData.get(kd).interval);
+          byCanvasData.delete(kd);
+        }
+      }
+    } else if (!canvas._pngLoading && new Date() - (canvas._pngNextTry || 0) > 0) {
+      // not loaded (yet) - the worker may still be rendering it, so retry
+      canvas._pngLoading = true;
+      var pngImg = new Image();
+      pngImg.onload = function () {
+        canvas._pngImg = pngImg;
+        canvas._pngLoading = false;
+        canvas._blendStart = new Date();
+      };
+      pngImg.onerror = function () {
+        canvas._pngLoading = false;
+        canvas._pngNextTry = new Date() + 5000;
+      };
+      pngImg.src = canvas._pngUrl;
+    }
+  }
+
   // if we are after the last time don't draw the paw
   if (endTime > maxTime) {
     if (jQuery(canvas).parent().attr('id') == "detailed_canvas") {
@@ -110,7 +156,7 @@ function playback(canvas, structure) {
     if (typeof d.pos == "undefined") continue;
     if (d.pos.length < 1) continue;
     // respect per-stroke opacity (e.g. pencil-style AI strokes)
-    ctx.globalAlpha = typeof d.opacity == "undefined" ? 1 : d.opacity;
+    ctx.globalAlpha = (typeof d.opacity == "undefined" ? 1 : d.opacity) * strokeFade;
     // set color and line, start drawing pos values
     ctx.beginPath();
     ctx.moveTo(Math.round(d.pos[0][0] * w), Math.round(d.pos[0][1] * h));
@@ -269,6 +315,11 @@ jQuery(document).ready(function () {
       clearInterval(byCanvasData.get(keyFromCanvas(canvas)).interval);
       byCanvasData.delete(keyFromCanvas(canvas));
     }
+    // reset the png blend state so the animation plays on every opening
+    canvas._pngImg = null;
+    canvas._pngLoading = false;
+    canvas._pngNextTry = 0;
+    canvas._blendStart = null;
     // set the draw paw
     // random which draw paw
     if (Math.random() > 0.5) {
@@ -278,10 +329,11 @@ jQuery(document).ready(function () {
     }
     
     
-    // find the correct structure and play it back
+    // find the correct structure and play it back (structures[i][2] is the
+    // finished .png, if one exists)
     for (var i = 0; i < structures.length; i++) {
       if (structures[i][0] == num)
-        playback(canvas, structures[i][1]);
+        playback(canvas, structures[i][1], structures[i][2]);
     }
   });
   
