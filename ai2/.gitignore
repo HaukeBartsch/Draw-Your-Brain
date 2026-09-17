@@ -1,0 +1,9 @@
+venv/
+__pycache__/
+# generated images + any local model cache
+outputs/
+*.png
+*.jpg
+# worker runtime artifacts (lock + log)
+worker.lock
+worker.log
