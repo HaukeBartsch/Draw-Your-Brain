@@ -282,6 +282,9 @@ def main(argv=None) -> int:
     ap.add_argument("--seed", type=int, default=None, help="random seed for reproducibility")
     ap.add_argument("--dtype", default="auto",
                     choices=["auto", "float32", "bfloat16"])
+    ap.add_argument("--device", default="auto",
+                    choices=["auto", "mps", "cpu", "cuda"],
+                    help="compute device (default: auto = MPS if available, else CPU)")
     ap.add_argument("--token", default=None,
                     help="Hugging Face token for gated models (default: env/stored)")
     ap.add_argument("--offline", action="store_true",
@@ -301,14 +304,12 @@ def main(argv=None) -> int:
         log(f"another worker holds the lock ({LOCK_FILE}); exiting.")
         return 0
 
-    import torch
-
     import pipeline as fx
 
     signal.signal(signal.SIGTERM, _signal_handler)
     signal.signal(signal.SIGINT, _signal_handler)
 
-    device = torch.device("cpu")
+    device = fx.pick_device(args.device)
     dtype = fx.pick_dtype(device, args.dtype)
     holder = PipelineHolder(device, dtype, token=args.token, offline=args.offline)
     log(f"worker started (pid {os.getpid()}), data_dir={args.data_dir}, "

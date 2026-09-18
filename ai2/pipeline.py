@@ -1,4 +1,4 @@
-"""FLUX.2 image-to-image pipeline, CPU-friendly.
+"""FLUX.2 image-to-image pipeline.
 
 Thin wrapper around a diffusers FLUX.2 pipeline.  It takes a *sketch* (the
 user's drawing, rendered to a white background) and turns it into a finished
@@ -10,10 +10,12 @@ The input image is used as FLUX.2's *image conditioning* (reference tokens
 appended to the denoising sequence), so the sketch supplies the composition
 and the prompt supplies the style.
 
-Everything is written to run on a CPU:
+It runs on whatever compute is available, in this order:
 
-* the device is always ``cpu`` (no CUDA / MPS required);
-* the dtype defaults to ``bfloat16`` when the CPU supports it (halving the
+* the device defaults to the Apple GPU (``mps``) when it is available, else
+  the CPU — so a plain CPU box just works and an Apple Silicon Mac uses the
+  GPU; ``pick_device`` (and each CLI's ``--device``) can force one;
+* the dtype defaults to ``bfloat16`` when the device supports it (halving the
   memory footprint vs. ``float32``) and falls back to ``float32`` otherwise;
 * the pipeline class is picked automatically from the model repo id, so the
   9B "klein" models (realistic on CPU) and the 32B "dev" model (quality
@@ -67,6 +69,28 @@ def pick_dtype(device, requested: str = "auto"):
         return getattr(torch, requested)
 
     return torch.bfloat16
+
+
+def pick_device(requested: str = "auto"):
+    """Choose a compute device.
+
+    ``requested`` may be ``"auto"`` (the default) or one of ``"mps" | "cpu" |
+    "cuda"``.
+
+    With ``auto`` the device is chosen for the machine: the Apple GPU
+    (``mps``) when it is available — Apple Silicon on macOS with an MPS-capable
+    PyTorch build — and the CPU otherwise.  So the same code runs unchanged on
+    a plain CPU box and on a Mac, and the Mac gets the GPU for free.  Pass a
+    specific device (via ``--device``) to force one.
+    """
+    import torch
+
+    if requested and requested.lower() != "auto":
+        return torch.device(requested)
+
+    if torch.backends.mps.is_available():
+        return torch.device("mps")
+    return torch.device("cpu")
 
 
 def load_pipeline(repo_id: str, device, dtype, local_files_only: bool = False, token=None):

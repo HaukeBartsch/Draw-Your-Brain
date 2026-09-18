@@ -110,6 +110,11 @@ python3 -m venv venv
 
 `diffusers>=0.40.0` is required (that is where the `Flux2*` pipelines live).
 
+> **Device:** the worker auto-picks the compute device — the Apple GPU (`mps`)
+> when it is available, else the CPU. On Apple Silicon the PyTorch build above
+> already includes the MPS backend, so no extra install is needed. Force a
+> device with `--device mps|cpu|cuda` (default `auto`).
+
 ## Authentication (gated models)
 
 The FLUX.2 weights are **gated** on Hugging Face — a valid credential and
@@ -147,6 +152,10 @@ only saves the `.code`, so it needs no credential at all.
 
 # reproducible
 ./venv/bin/python predict.py --sketch sketch.png --out out.png --seed 42
+
+# pick the compute device (default auto = MPS if available, else CPU)
+./venv/bin/python predict.py --sketch sketch.png --out out.png --device mps
+./venv/bin/python predict.py --sketch sketch.png --out out.png --device cpu
 ```
 
 The CLI prints **one JSON object to stdout** when it finishes
@@ -169,7 +178,10 @@ Memory is the binding constraint on a CPU.  Rough weights-only footprint:
 9B ≈ 18 GB in `bfloat16` / 36 GB in `float32`; 32B ≈ 64 GB / 128 GB.  Add headroom
 for the VAE and activations.
 
-- **dtype**: the default on CPU is **`bfloat16`** — it halves the memory
+- **device**: the default is **`auto`** — the Apple GPU (`mps`) when available,
+  else the CPU.  On an Apple Silicon Mac this uses the GPU for free (much faster
+  than CPU); a plain CPU box is unaffected.  Force one with `--device mps|cpu|cuda`.
+- **dtype**: the default is **`bfloat16`** — it halves the memory
   footprint (a 32 GB model becomes ~16 GB), which is what actually fits, and is
   supported by modern x86 and Apple Silicon.  Use `--dtype float32` only if a
   CPU lacks bf16 (it costs 2× RAM).

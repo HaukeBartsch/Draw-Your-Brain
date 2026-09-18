@@ -7,7 +7,7 @@ The prompt is fixed for the app by default:
 
     "Convert to a pencil drawing, add water colors."
 
-Everything runs on the CPU by design.
+The device is auto-picked: the Apple GPU (MPS) when available, else the CPU.
 
 Contract (so the PHP endpoint can rely on it):
   * all log / progress lines go to **stderr**;
@@ -138,7 +138,10 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--seed", type=int, default=None, help="random seed for reproducibility")
     ap.add_argument("--dtype", default="auto",
                     choices=["auto", "float32", "bfloat16", "float16"],
-                    help="compute dtype (default: auto = bfloat16 on supported CPUs, else float32)")
+                    help="compute dtype (default: auto = bfloat16 on supported devices, else float32)")
+    ap.add_argument("--device", default="auto",
+                    choices=["auto", "mps", "cpu", "cuda"],
+                    help="compute device (default: auto = MPS if available, else CPU)")
     ap.add_argument("--offline", action="store_true",
                     help="do not contact Hugging Face; use locally cached weights only")
     ap.add_argument("--token", default=None,
@@ -155,7 +158,6 @@ def main(argv=None) -> int:
         return 2
 
     # Import the heavy deps only now, so `--help` stays instant and dependency-free.
-    import torch
     from PIL import Image
 
     import pipeline as fx
@@ -165,9 +167,9 @@ def main(argv=None) -> int:
         sketch = Image.open(args.sketch)
         sketch.load()
 
-        device = torch.device("cpu")
+        device = fx.pick_device(args.device)
         dtype = fx.pick_dtype(device, args.dtype)
-        _log(f"loading {args.model} on CPU (dtype={dtype}) ...")
+        _log(f"loading {args.model} on {device.type} (dtype={dtype}) ...")
         pipe = fx.load_pipeline(args.model, device, dtype,
                                 local_files_only=args.offline, token=args.token)
 
